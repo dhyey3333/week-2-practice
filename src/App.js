@@ -1,218 +1,283 @@
 import { useState } from "react";
 
+import Navbar from "./components/Navbar";
+import Sidebar from "./components/Sidebar";
+import Dashboard from "./components/Dashboard";
+import Employees from "./components/Employees";
+import Projects from "./components/Projects";
+import Reports from "./components/Reports";
+import Analytics from "./components/Analytics";
+import Attendance from "./components/Attendance";
+import Settings from "./components/Settings";
+
+import "./App.css";
+
+
 function App() {
+  const [loggedIn, setLoggedIn] = useState(false);
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const [error, setError] = useState("");
+
+  const [page, setPage] = useState("dashboard");
 
   const [employees, setEmployees] = useState([
-    {
-      id: 1,
-      name: "John",
-      department: "Development"
-    },
-    {
-      id: 2,
-      name: "Sarah",
-      department: "HR"
-    }
+    { id: 1, name: "John Smith", department: "Development", status: "Active" },
+    { id: 2, name: "Sarah Johnson", department: "HR", status: "Active" },
+    { id: 3, name: "Marcus Lee", department: "Sales", status: "Active" },
+    { id: 4, name: "Priya Mehta", department: "Marketing", status: "Leave" }
   ]);
 
-  const [name, setName] = useState("");
-  const [department, setDepartment] = useState("");
+  const [projects] = useState([
+    { id: 1, name: "Employee Portal", progress: 90 },
+    { id: 2, name: "CRM Dashboard", progress: 75 },
+    { id: 3, name: "HR Portal", progress: 100 },
+    { id: 4, name: "Mobile App", progress: 42 }
+  ]);
 
-  const addEmployee = () => {
+  const addEmployee = (name, department) => {
 
-    if(name === "" || department === ""){
-
-      alert("Please fill all fields");
-      return;
-
-    }
-
-    const newEmployee = {
-
-      id: employees.length + 1,
-      name: name,
-      department: department
-
-    };
-
-    setEmployees([...employees,newEmployee]);
-
-    setName("");
-    setDepartment("");
+    setEmployees(prev => [
+      ...prev,
+      {
+        id: prev.length + 1,
+        name,
+        department,
+        status: "Active"
+      }
+    ]);
 
   };
 
+  const deleteEmployee = (id) => {
+
+    setEmployees(
+      prev =>
+        prev.filter(
+          emp => emp.id !== id
+        )
+    );
+
+  };
+
+  if (!loggedIn) {
+
   return (
 
-    <div
-      style={{
-        minHeight:"100vh",
-        background:
-        "linear-gradient(135deg,#0f172a,#1e3a8a)",
-        padding:"30px",
-        color:"white",
-        fontFamily:"Segoe UI"
-      }}
-    >
+    <div className="login-page">
 
-      <h1>
-        🚀 Digizura Employee Management Portal
-      </h1>
+      <div className="login-card">
 
-      <p>
-        Week 2 Day 4 - Forms & Validation
-      </p>
+        <h1>DIGIZURA</h1>
 
-      <div
-        style={{
-          display:"grid",
-          gridTemplateColumns:
-          "repeat(auto-fit,minmax(250px,1fr))",
-          gap:"20px",
-          marginTop:"30px"
-        }}
-      >
+        <p>
+          Employee Management Portal
+        </p>
 
-        <div style={cardStyle}>
-          <h1>{employees.length}</h1>
-          <p>Total Employees</p>
-        </div>
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) =>
+            setEmail(e.target.value)
+          }
+        />
 
-        <div style={cardStyle}>
-          <h1>15</h1>
-          <p>Projects</p>
-        </div>
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) =>
+            setPassword(e.target.value)
+          }
+        />
 
-        <div style={cardStyle}>
-          <h1>320</h1>
-          <p>Tasks Completed</p>
-        </div>
+        {error && (
+          <p
+            style={{
+              color: "red",
+              marginTop: "10px"
+            }}
+          >
+            {error}
+          </p>
+        )}
 
-        <div style={cardStyle}>
-          <h1>₹2.5 Cr</h1>
-          <p>Revenue</p>
-        </div>
+        <button
+  onClick={() => {
+
+    const savedEmail =
+      localStorage.getItem("userEmail");
+
+    const savedPassword =
+      localStorage.getItem("userPassword");
+
+    if (!savedEmail || !savedPassword) {
+
+      setError(
+        "No account found. Please register first."
+      );
+
+      return;
+    }
+
+    if (
+      email !== savedEmail ||
+      password !== savedPassword
+    ) {
+
+      setError(
+        "Invalid email or password"
+      );
+
+      return;
+    }
+
+    setError("");
+
+    setLoggedIn(true);
+
+  }}
+>
+  Login
+</button>
+<p
+  className="login-link"
+  onClick={() => {
+
+    const newEmail =
+      prompt("Enter Email");
+
+    const newPassword =
+      prompt("Create Password");
+
+    if (
+      newEmail &&
+      newPassword
+    ) {
+
+      localStorage.setItem(
+        "userEmail",
+        newEmail
+      );
+
+      localStorage.setItem(
+        "userPassword",
+        newPassword
+      );
+
+      alert(
+        "Account created successfully"
+      );
+
+    }
+
+  }}
+>
+  Register New User
+</p>
+<p
+  className="login-link"
+  onClick={() => {
+
+    const mail =
+      prompt("Enter your email");
+
+    const savedEmail =
+      localStorage.getItem(
+        "userEmail"
+      );
+
+    if (
+      mail === savedEmail
+    ) {
+
+      alert(
+        "Your password is: " +
+        localStorage.getItem(
+          "userPassword"
+        )
+      );
+
+    } else {
+
+      alert(
+        "Email not found"
+      );
+
+    }
+
+  }}
+>
+  Forgot Password?
+</p>
 
       </div>
 
-      <div
-        style={{
-          display:"grid",
-          gridTemplateColumns:"1fr 2fr",
-          gap:"20px",
-          marginTop:"40px"
-        }}
-      >
+    </div>
 
-        <div style={glassCard}>
+  );
 
-          <h2>Add Employee</h2>
+}
+  return (
 
-          <input
-            type="text"
-            placeholder="Employee Name"
-            value={name}
-            onChange={(e)=>
-              setName(e.target.value)
-            }
-            style={inputStyle}
-          />
+    <div className="app-wrapper">
 
-          <select
-            value={department}
-            onChange={(e)=>
-              setDepartment(e.target.value)
-            }
-            style={inputStyle}
-          >
+      <Navbar
+        setLoggedIn={setLoggedIn}
+        setPage={setPage}
+      />
 
-            <option value="">
-              Select Department
-            </option>
+      <div className="main-layout">
 
-            <option>
-              Development
-            </option>
+        <Sidebar
+          page={page}
+          setPage={setPage}
+        />
 
-            <option>
-              HR
-            </option>
+        <div className="content">
 
-            <option>
-              Sales
-            </option>
+          {page === "dashboard" && (
+            <Dashboard
+              employees={employees}
+              projects={projects}
+            />
+          )}
 
-            <option>
-              Marketing
-            </option>
+          {page === "employees" && (
+            <Employees
+              employees={employees}
+              addEmployee={addEmployee}
+              deleteEmployee={deleteEmployee}
+            />
+          )}
 
-          </select>
+          {page === "projects" && (
+            <Projects
+              projects={projects}
+            />
+          )}
 
-          <button
-            onClick={addEmployee}
-            style={buttonStyle}
-          >
-            Add Employee
-          </button>
+          {page === "reports" && (
+            <Reports
+              employees={employees}
+              projects={projects}
+            />
+          )}
 
-        </div>
+          {page === "analytics" && (
+            <Analytics />
+          )}
 
-        <div style={glassCard}>
+          {page === "attendance" && (
+            <Attendance />
+          )}
 
-          <h2>Employee Directory</h2>
-
-          <table
-            style={{
-              width:"100%",
-              borderCollapse:"collapse"
-            }}
-          >
-
-            <thead>
-
-              <tr>
-
-                <th style={tableHead}>
-                  ID
-                </th>
-
-                <th style={tableHead}>
-                  Name
-                </th>
-
-                <th style={tableHead}>
-                  Department
-                </th>
-
-              </tr>
-
-            </thead>
-
-            <tbody>
-
-              {employees.map((emp)=>(
-
-                <tr key={emp.id}>
-
-                  <td style={tableCell}>
-                    {emp.id}
-                  </td>
-
-                  <td style={tableCell}>
-                    {emp.name}
-                  </td>
-
-                  <td style={tableCell}>
-                    {emp.department}
-                  </td>
-
-                </tr>
-
-              ))}
-
-            </tbody>
-
-          </table>
+          {page === "settings" && (
+            <Settings />
+          )}
 
         </div>
 
@@ -223,61 +288,5 @@ function App() {
   );
 
 }
-
-const cardStyle = {
-
-  background:"rgba(255,255,255,0.12)",
-  backdropFilter:"blur(10px)",
-  padding:"25px",
-  borderRadius:"20px",
-  textAlign:"center"
-
-};
-
-const glassCard = {
-
-  background:"rgba(255,255,255,0.12)",
-  backdropFilter:"blur(10px)",
-  padding:"25px",
-  borderRadius:"20px"
-
-};
-
-const inputStyle = {
-
-  width:"100%",
-  padding:"12px",
-  marginTop:"15px",
-  borderRadius:"10px",
-  border:"none"
-
-};
-
-const buttonStyle = {
-
-  width:"100%",
-  padding:"12px",
-  marginTop:"20px",
-  border:"none",
-  borderRadius:"10px",
-  background:"#22c55e",
-  color:"white",
-  cursor:"pointer"
-
-};
-
-const tableHead = {
-
-  padding:"12px",
-  borderBottom:"1px solid white"
-
-};
-
-const tableCell = {
-
-  padding:"12px",
-  textAlign:"center"
-
-};
 
 export default App;
